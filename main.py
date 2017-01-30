@@ -15,7 +15,7 @@ import webapp2
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        textarea1_label ="<label style='background-color:white;display:inline-block;width:150px'>Username * : </label>"
+        textarea1_label ="<label style='font-size:16px;background-color:white;display:inline-block;width:150px'>Username * : </label>"
         textarea1 = "<input type ='text' name='Username'/>"
         textarea2_label ="<label style='background-color:white;display:inline-block;width:150px'>Password * : </label>"
         textarea2 = "<input type ='text' name='password'/>"
@@ -28,11 +28,12 @@ class MainHandler(webapp2.RequestHandler):
         message = "I still need to validate and display the warnings !"
         textarea = "<textarea type='text' style='width:500px'>"+message+"</textarea>"
 
-        header = "<h2 style='background-color:rgb(0,180,200);color:white;text-align:center'>USER SIGN-UP</h2>"
-        body = "<body style='background-color:white'><br><br></body>"
+        header = "<h2 style='font-family: 'Times New Roman';color:black' > Signup</h2>"
+        body = "<body style='background-color:white'><br></body>"
+#        header = "<h2 style='background-color:rgb(0,180,200);color:white;text-align:center'>USER SIGN-UP</h2>"
 #        body = "<body style='background-color:rgb(0,180,200)'>Please note that, the first three fields ar required.<br><br></body>"
 
-        submit="<input type='submit'/>"
+        submit="<input type='submit' value='Submit Query'/>"
         form= ("<form>"+
 
         textarea1_label+textarea1+"<br><br>"+
@@ -41,7 +42,7 @@ class MainHandler(webapp2.RequestHandler):
         textarea4_label+textarea4+"<br><br>"+
         textarea+"<br><br>"+submit+
         "</form>")
-        self.response.out.write(body+form)
+        self.response.out.write(header +body+form)
 
 app = webapp2.WSGIApplication([
     ('/',MainHandler)
