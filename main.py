@@ -3,6 +3,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.# See the License for the specific language governing permissions and# limitations under the License.
 import webapp2
 import cgi
+def validate_data(fieldname):
+    return False
 def display(fieldname):
     textarea_label = "<label type='text' style='display:inline-block;width:150px;font-size:16px'>"+fieldname+ "</label>"
 #if fieldname == Password info = "Mypassword"
@@ -27,9 +29,14 @@ class MainHandler(webapp2.RequestHandler):
         content = build_signup()  #build_signup("signup")
         self.response.out.write(header + content)
     def post(self):
-#        header = "<h1 style='color:red;'>"+ Sorry signup again. +"</h1>"
-        content = build_signup()   #build_signup("Sorry")
-        self.response.out.write(content)
+        if validate_data("Username") == True :
+            correctheader = "<h1 style='color:red;'> Thanks for entering valid data as input.</h1>"
+            content = build_signup()   #build_signup("Sorry")
+            self.response.out.write(correctheader+content)
+        elif validate_data("Username") == False :
+            header = "<h1 style='color:red;'> Please signup again .Enter valid data as input.</h1>"
+            content = build_signup()   #build_signup("Sorry")
+            self.response.out.write(header+content)
 app = webapp2.WSGIApplication( [
     ('/', MainHandler)
     ],debug=True)
