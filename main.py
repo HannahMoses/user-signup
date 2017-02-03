@@ -1,54 +1,87 @@
-#!/usr/bin/env python## Copyright 2007 Google Inc.## Licensed under the Apache License, Version 2.0 (the "License");# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at#http://www.apache.org/licenses/LICENSE-2.0# Unless required by applicable law or agreed to in writing, software# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.# See the License for the specific language governing permissions and# limitations under the License.
+#FIFTH VERSION BEFORE I STARTED UDACITY STYLE CODING
 import webapp2
 import cgi
-def validate_data(fieldname):
-    return False
-def display(fieldname):
-    textarea_label = "<label type='text' style='display:inline-block;width:150px;font-size:16px'>"+fieldname+ "</label>"
-#if fieldname == Password info = "Mypassword"
-    textarea = "<input type='text' style='width:150px'/>"
-    warning = " "+fieldname + " warning appears here."
-    return textarea_label + textarea + warning
+import re
+form="""
+<html>
+<head>
+</head>
+<body style="background-color:white;">
+<h1>Signup</h1>
 
-def build_signup():
-    body = "<body style='background-color:white'>Hi.</body>"
-    submit="<input type ='submit' value='Submit Query' />"
-    form =("<form method='post'>" +
-            display("Username")+"<br><br>"+
-            display("Password")+"<br><br>"+
-            display("Verify Password")+"<br><br>"+
-            display("Email(optional)")+"<br><br>"+
-            submit+
-            "</form>")
-    return body + form
+    <form method="post">
+        <label type="text" style="display:inline-block;width:150px;color:black">Username</label>
+        <input type="text" name="username">%(username_error)s<br><br>
+        <label type="text" style="display:inline-block;width:150px;color:black">Password</label>
+        <input type="password" name="password">%(password_error)s<br><br>
+        <label type="text" style="display:inline-block;width:150px;color:black">Verify Password</label>
+        <input type="password" name="Vpassword">%(Vpassword_error)s<br><br>
+        <label type="text" style="display:inline-block;width:150px;color:black">Email Optional</label>
+        <input type="text" name="email">%(email_error)s<br><br>
+    <input type="submit" value="Submit Query">
+    </form>
+</body>
+</html>
+"""
+
+USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
+def valid_username(username):
+    return username and USER_RE.match(username)
+PASS_RE = re.compile(r"^.{3,20}$")
+def valid_password(password):
+    return password and PASS_RE.match(password)
+
+EMAIL_RE = re.compile(r'^[\S]+@[\S]+\.[S]+$')
+def valid_email(email):
+    return not email or EMAIL_RE.match(email)
+
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        header = "<h1 style='color:black;'>Signup</h1>"
-        content = build_signup()  #build_signup("signup")
-        self.response.out.write(header + content)
+        inputinfo = dict(username_error = "",
+                             password_error="",
+                             Vpassword_error="",
+                             email_error="")# to preserve the data user typed in Username box
+
+        global form# to declare that form is the global variable declared in hTMl above and
+                    #it is being assigned to a local variable form which replaces username_error etc
+                    # with new values in the " "
+        form= form % inputinfo
+        self.response.out.write(form)
     def post(self):
-        if validate_data("Username") == True :
-            correctheader = "<h1 style='color:red;'> Thanks for entering valid data as input.</h1>"
-            content = build_signup()   #build_signup("Sorry")
-            self.response.out.write(correctheader+content)
-        elif validate_data("Username") == False :
-            header = "<h1 style='color:red;'> Please signup again .Enter valid data as input.</h1>"
-            content = build_signup()   #build_signup("Sorry")
-            self.response.out.write(header+content)
-app = webapp2.WSGIApplication( [
-    ('/', MainHandler)
+        user =self.request.get("username")
+        faulty_form=True
+#        validuser = cgi. escaped(user)
+        passw = self.request.get("password")
+        VerifiedPassword = self.request.get("Vpassword")
+        Email = self.request.get("email")
+        userwarn = ""
+        pwdwarn = ""
+        vpwdwarn = ""
+        emailwarn = ""
+        if not valid_username(user):#If you supply "user" as this parameter, then it is not the same as user = self.request.get("username")
+            userwarn = "This is not valid username."
+            faulty_form = True
+        if not valid_password(passw):
+            pwdwarn = "This is not a valid password"
+            faulty_form = True
+        elif VerifiedPassword !=passw:
+            vpwdwarn = "Passwords do not match."
+            faulty_form = True
+        if not valid_email(Email):
+            emailwarn = "This is not a valid email."
+            faulty_form = True
+        inputinfo = dict(username_error = userwarn,
+                         password_error=pwdwarn,
+                         Vpassword_error=vpwdwarn,
+                         email_error=emailwarn)
+
+        self.response.write(form % inputinfo)
+
+class WelcomeHandler(webapp2.RequestHandler):
+    def get(self):
+        user = self.request.get("username")
+        content = "Welcome," +user +"!"
+        self.response.write(content)
+app = webapp2.WSGIApplication([ ('/',MainHandler),
+    ('/welcome',WelcomeHandler)
     ],debug=True)
-#class Welcome(bighead):
-#     def get(self):
-#         user = self.request.get("Username")
-#         # if valid_Username(Username):
-#         #     self.render("<h1 style='font-family: 'Times New Roman';color:black' > Welcome, "   +user +"! </h1>",user=Username)
-#         # else:
-#         #     self.redirect('/')
-#         self.response.write("Fix errors in form.")
-# app = webapp2.WSGIApplication([
-#     ('/',MainHandler),
-# #    ('/welcome',Welcome)
-#     ],debug=True)
