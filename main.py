@@ -1,91 +1,88 @@
-
-#2017Jan31 rough play of user sign up
+#FIFTH VERSION BEFORE I STARTED UDACITY STYLE CODING
 import webapp2
 import cgi
-# def getwarn():
-#     if goodusername:
-#         return textarea_label + textarea
-#     else:
-#         warned = "warning appears here."
-#         return textarea_label+textarea+warned
+import re
+form="""
+<html>
+<head>
+</head>
+<body style="background-color:white;">
+<h1>Signup</h1>
 
-# def display_Userwarned(warning):
-#     textarea_label = "<label style='display:in-line block;width:150px'>Username</label>"
-#     textarea = "<textarea name ='userip'>" +textarea_content +"</textarea>"
-#     warn = "<textarea style='color:red' name ='userwarning'>" + warning +"</textarea>"
-#     gooduser = valid_info("user")
-#     return text_label + textarea + warn
-warned=" "
-def valid_info(ipgiven):
-    x= ipgiven
-    for i in range(len(ipgiven)):
-        if x[i] != " " :
-            return True
-    warned = "This is not a valid username."
-    return False
-def getwarned(warned):
-    if warned == "This is not a valid username":
-        return False
-    elif warned == " ":
-        return True
-def display_Username(fieldname):
-    textarea_label = "<label style='display:in-line block;width:150px'>"+fieldname+" </label>"
-    if fieldname == "Username" :
-        textarea = "<input type='text' name ='ipgiven'/>"
-        if valid_info('ipgiven'):
-            validuser='ipgiven'
-            bighead="correctinfoheader"
-            return bighead
-        else:
-            invaliduser = ipgiven
-#            warned = " This is not a valid username."
-            bighead = "errorinfoheader"
-            return bighead
-    elif fieldname == "Password" :
-        textarea = "<input type='text' name ='ipgiven'/>"
-        goodpassword = valid_info("ipgiven")
-        if goodpassword:
-            pwd='ipgiven'
-            return textarea_label + textarea
-        else:
-            warned = "warning appears here."
-            return textarea_label+textarea+warned
+    <form method="post">
+        <label type="text" style="display:inline-block;width:150px;color:black">Username</label>
+        <input type="text" name="username">%(username_error)s<br><br>
+        <label type="text" style="display:inline-block;width:150px;color:black">Password</label>
+        <input type="password" name="password">%(password_error)s<br><br>
+        <label type="text" style="display:inline-block;width:150px;color:black">Verify Password</label>
+        <input type="password" name="Vpassword">%(Vpassword_error)s<br><br>
+        <label type="text" style="display:inline-block;width:150px;color:black">Email Optional</label>
+        <input type="text" name="email">%(email_error)s<br><br>
+    <input type="submit" value="Submit Query">
+    </form>
+</body>
+</html>
+"""
 
-def build_signup():
-    body = "<body style='background-color:white'>.<br><br></body>"
-    submit = "<input type='submit' value='Submit Query'/>"
-    form = ("<form style='color=pink' method='post'>" +
-           display_Username("Username")+"<br><br>"+submit+
-          "</form>")
-    outform = build_output(display_Username("Username"))
-    return body + form
 
-def build_output(bighead):
-    textarea_label = "<label style='display:in-line block;width:150px'>"+bighead+" </label>"
-    body = "<body style='background-color:white'>.<br><br></body>"
-    submit = "<input type='submit' value='Submit Query'/>"
-    outform = ("<form style='color=pink' method='post'>" +
-              display_Username("Username")+"<br><br>"+ warned +submit+
-              "</form>")
-#     outform = build_output(display_Username("Username"))
-    return body + outform
+USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
+def valid_username(username):
+    return username and USER_RE.match(username)
+PASS_RE = re.compile(r"^.{3,20}$")
+def valid_password(password):
+    return password and PASS_RE.match(password)
+
+EMAIL_RE = re.compile(r'^[\S]+@[\S]+\.[S]+$')
+def valid_email(email):
+    return not email or EMAIL_RE.match(email)
+
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        header = "<h1 style='font-family: 'Times New Roman';color:black' > Signup</h1>"
-        content = build_signup()
-        self.response.out.write(header + content)
+        inputinfo = dict(username_error = "",
+                             password_error="",
+                             Vpassword_error="",
+                             email_error="")# to preserve the data user typed in Username box
+
+        global form# to declare that form is the global variable declared in hTMl above and
+                    #it is being assigned to a local variable form which replaces username_error etc
+                    # with new values in the " "
+        form= form % inputinfo
+        self.response.out.write(form)
     def post(self):
-        if getwarned(warned) == True:
-#            fieldname == "Username" and bighead == "correctinfoheader":
-            user = self.request.get("ipgiven")
-            correctinfoheader = "<h1 style='font-family: 'Times New Roman';color:black' > Welcome, " + user +"! </h1>"
-            content= build_signup()
-            self.response.out.write(correctinfoheader+content)
-        elif  getwarned(warned) == "This is not a valid user name.":
-#            fieldname == "Username" and bighead == "errorinfoheader":
-            warningnow = " This is not a valid username"
-            content = output()
-            self.request.out.write(errorinfoheader+content+warningnow)
-app = webapp2.WSGIApplication([
-    ('/', MainHandler)
-    ], debug=True)
+        user =self.request.get("username")
+        faulty_form=False
+#        validuser = cgi. escaped(user)
+        passw = self.request.get("password")
+        VerifiedPassword = self.request.get("Vpassword")
+        Email = self.request.get("email")
+        userwarn = ""
+        pwdwarn = ""
+        vpwdwarn = ""
+        emailwarn = ""
+        if not valid_username(user):#If you supply "user" as this parameter, then it is not the same as user = self.request.get("username")
+            userwarn = "This is not valid username."
+            faulty_form = True
+        if not valid_password(passw):
+            pwdwarn = "This is not a valid password"
+            faulty_form = True
+        elif VerifiedPassword !=passw:
+            vpwdwarn = "Passwords do not match."
+            faulty_form = True
+        if not valid_email(Email):
+            emailwarn = "This is not a valid email."
+            faulty_form = True
+        inputinfo = dict(username_error = userwarn,
+                         password_error=pwdwarn,
+                         Vpassword_error=vpwdwarn,
+                         email_error=emailwarn)
+        self.response.write( form % inputinfo)
+        if faulty_form == False:
+            self.redirect('/welcome' )
+class WelcomeHandler(webapp2.RequestHandler):
+    def get(self):
+        user = self.request.get("username")
+        content = "Welcome," +user +"!"
+        self.response.write(content)
+app = webapp2.WSGIApplication([ ('/',MainHandler),
+    ('/welcome',WelcomeHandler)
+    ],debug=True)
