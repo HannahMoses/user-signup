@@ -77,11 +77,11 @@ class MainHandler(webapp2.RequestHandler):
                          email_error=emailwarn)
         self.response.write( form % inputinfo)
         if faulty_form == False:
-            self.response.out.write("Welcome," +user +"!" )
+            self.redirect('/welcome')
 class WelcomeHandler(webapp2.RequestHandler):
     def get(self):
         user = self.request.get("username")
-        content = "Hello ,welcome," +user +"!"
+        content = "Welcome," +user +"!"
         self.response.write(content)
 app = webapp2.WSGIApplication([ ('/',MainHandler),
     ('/welcome',WelcomeHandler)
