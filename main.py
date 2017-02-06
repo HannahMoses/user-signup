@@ -51,7 +51,7 @@ class MainHandler(webapp2.RequestHandler):
     def post(self):
         user =self.request.get("username")
         faulty_form=False
-#        validuser = cgi. escaped(user)
+#        validuser = cgi. escaped(user) 
         passw = self.request.get("password")
         VerifiedPassword = self.request.get("Vpassword")
         Email = self.request.get("email")
