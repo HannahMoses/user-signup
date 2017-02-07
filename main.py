@@ -6,7 +6,7 @@ form="""
 <html>
 <head>
 </head>
-<body style="background-color:white;">
+<body style="background-color:rgb(255,167,132);">
 <h1>Signup</h1>
 
     <form method="post">
@@ -32,7 +32,7 @@ PASS_RE = re.compile(r"^.{3,20}$")
 def valid_password(password):
     return password and PASS_RE.match(password)
 
-EMAIL_RE = re.compile(r'^[\S]+@[\S]+\.[S]+$')
+EMAIL_RE = re.compile(r"^[\S]+@[\S]+\.[\S]+$")
 def valid_email(email):
     return not email or EMAIL_RE.match(email)
 
@@ -60,16 +60,16 @@ class MainHandler(webapp2.RequestHandler):
         vpwdwarn = ""
         emailwarn = ""
         if not valid_username(user):#If you supply "user" as this parameter, then it is not the same as user = self.request.get("username")
-            userwarn = "This is not valid username."
+            userwarn = "<label style='color:red'>   This is not valid username.</label>"
             faulty_form = True
         if not valid_password(passw):
-            pwdwarn = "This is not a valid password"
+            pwdwarn = "<label style='color:red'>   This is not a valid password.</label>"
             faulty_form = True
         elif VerifiedPassword !=passw:
-            vpwdwarn = "Passwords do not match."
+            vpwdwarn ="<label style='color:red'> Passwords do not match.</label>"
             faulty_form = True
         if not valid_email(Email):
-            emailwarn = "This is not a valid email."
+            emailwarn = "<label style='color:red'> This is not a valid email.</label>"
             faulty_form = True
         inputinfo = dict(username_error = userwarn,
                          password_error=pwdwarn,
