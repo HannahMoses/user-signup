@@ -46,7 +46,7 @@ class MainHandler(webapp2.RequestHandler):
         global form# to declare that form is the global variable declared in hTMl above and
                     #it is being assigned to a local variable form which replaces username_error etc
                     # with new values in the " "
-        # form= form % inputinfo#overwriting the original form
+        # form= form % inputinfo#overwriting the original form, so I commented this line of code& inserted the line below
         self.response.out.write(form % inputinfo)
     def post(self):
         user =self.request.get("username")
@@ -77,7 +77,7 @@ class MainHandler(webapp2.RequestHandler):
                          email_error=emailwarn)
         self.response.write( form % inputinfo)
         if faulty_form == False:
-            self.redirect('/welcome')
+            self.redirect('/welcome?username={0}'.format(user))
 class WelcomeHandler(webapp2.RequestHandler):
     def get(self):
         user = self.request.get("username")
