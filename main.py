@@ -11,13 +11,13 @@ form="""
 
     <form method="post">
         <label type="text" style="display:inline-block;width:150px;color:black">Username</label>
-        <input type="text" name="username">%(username_error)s<br><br>
+        <input type="text" name="username" value="%(username)s">%(username_error)s<br><br>
         <label type="text" style="display:inline-block;width:150px;color:black">Password</label>
         <input type="password" name="password">%(password_error)s<br><br>
         <label type="text" style="display:inline-block;width:150px;color:black">Verify Password</label>
         <input type="password" name="Vpassword">%(Vpassword_error)s<br><br>
         <label type="text" style="display:inline-block;width:150px;color:black">Email Optional</label>
-        <input type="text" name="email">%(email_error)s<br><br>
+        <input type="text" name="email"value="%(email)s">%(email_error)s<br><br>
     <input type="submit" value="Submit Query">
     </form>
 </body>
@@ -38,10 +38,10 @@ def valid_email(email):
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        inputinfo = dict(username_error = "",
+        inputinfo = dict(username = "", username_error = "",
                              password_error="",
                              Vpassword_error="",
-                             email_error="")# to preserve the data user typed in Username box
+                             email="",email_error="")# to preserve the data user typed in Username box
 
         global form# to declare that form is the global variable declared in hTMl above and
                     #it is being assigned to a local variable form which replaces username_error etc
@@ -71,10 +71,10 @@ class MainHandler(webapp2.RequestHandler):
         if not valid_email(Email):
             emailwarn = "<label style='color:red'> This is not a valid email.</label>"
             faulty_form = True
-        inputinfo = dict(username_error = userwarn,
+        inputinfo = dict(username= user, username_error = userwarn,
                          password_error=pwdwarn,
                          Vpassword_error=vpwdwarn,
-                         email_error=emailwarn)
+                         email=Email,email_error=emailwarn)
         self.response.write( form % inputinfo)
         if faulty_form == False:
             self.redirect('/welcome?username={0}'.format(user))
